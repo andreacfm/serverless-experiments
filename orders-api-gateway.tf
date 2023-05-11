@@ -1,7 +1,7 @@
 locals {
-  api_name = "tasks-api"
+  api_name = "orders-api"
 }
-resource "aws_api_gateway_rest_api" "tasks-api" {
+resource "aws_api_gateway_rest_api" "orders-api" {
   body = jsonencode({
     openapi = "3.0.1"
     info = {
@@ -15,7 +15,7 @@ resource "aws_api_gateway_rest_api" "tasks-api" {
             httpMethod           = "POST"
             payloadFormatVersion = "1.0"
             type                 = "aws_proxy"
-            uri                  = module.create-tasks.lambda_function_qualified_invoke_arn
+            uri                  = module.create-order-function.lambda_function_qualified_invoke_arn
           }
         }
       }
@@ -30,10 +30,10 @@ resource "aws_api_gateway_rest_api" "tasks-api" {
 }
 
 resource "aws_api_gateway_deployment" "deployment" {
-  rest_api_id = aws_api_gateway_rest_api.tasks-api.id
+  rest_api_id = aws_api_gateway_rest_api.orders-api.id
 
   triggers = {
-    redeployment = sha1(jsonencode(aws_api_gateway_rest_api.tasks-api.body))
+    redeployment = sha1(jsonencode(aws_api_gateway_rest_api.orders-api.body))
   }
 
   lifecycle {
@@ -43,10 +43,10 @@ resource "aws_api_gateway_deployment" "deployment" {
 
 resource "aws_api_gateway_stage" "stage" {
   deployment_id = aws_api_gateway_deployment.deployment.id
-  rest_api_id   = aws_api_gateway_rest_api.tasks-api.id
+  rest_api_id   = aws_api_gateway_rest_api.orders-api.id
   stage_name    = "prod"
 }
 
-output "tasks_api_gateway_url" {
+output "orders_api_gateway_url" {
   value = aws_api_gateway_deployment.deployment.invoke_url
 }
