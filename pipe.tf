@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_log_group" "pipe_log" {
-  name = "/aws/events/pipe-logs"
+  name = "/tasks/events/pipe-logs"
 }
 
 resource "aws_iam_role" "pipe_role" {
@@ -64,76 +64,74 @@ resource "aws_iam_role" "pipe_role" {
   }
 }
 
-resource "aws_cloudformation_stack" "dynamodb_stream_pipe" {
-  name = "new-tasks-stream"
-
-  parameters = {
-    RoleArn   = aws_iam_role.pipe_role.arn
-    SourceArn = aws_dynamodb_table.tasks-table.stream_arn
-    TargetArn = aws_cloudwatch_log_group.pipe_log.arn
-  }
-
-  template_body = jsonencode({
-    "Parameters" : {
-      "SourceArn" : {
-        "Type" : "String",
-      },
-      "TargetArn" : {
-        "Type" : "String",
-      },
-      "RoleArn" : {
-        "Type" : "String"
-      }
-    },
-    "Resources" : {
-      "TasksPipe" : {
-        "Type" : "AWS::Pipes::Pipe",
-        "Properties" : {
-          "Name" : "new-tasks-stream-3",
-          "RoleArn" : { "Ref" : "RoleArn" }
-          "Source" : { "Ref" : "SourceArn" },
-          "SourceParameters" : {
-            "FilterCriteria": {
-              "Filters" : [{"Pattern" : "{\"eventSourceARN\" : [{ \"prefix\":\"${aws_dynamodb_table.tasks-table.arn}/stream\"}]}"}]
-            },
-            "DynamoDBStreamParameters" : {
-              "StartingPosition" : "LATEST"
-            }
-          }
-          "Target" : { "Ref" : "TargetArn" },
-          "TargetParameters" : {
-            "CloudWatchLogsParameters" : {
-              "LogStreamName" : "tasks-created"
-            },
-            "InputTemplate" : "{\"source\": \"dynamodb.tasks\",\"eventName\": <$.eventName>,\"task\": {\"id\": <$.dynamodb.NewImage.PK.S>,\"state\": <$.dynamodb.NewImage.state.S> } }"
-          }
-        }
-      }
-    }
-  })
-}
-
+#resource "aws_cloudformation_stack" "dynamodb_stream_pipe" {
+#  name = "new-tasks-stream"
 #
+#  parameters = {
+#    RoleArn   = aws_iam_role.pipe_role.arn
+#    SourceArn = aws_dynamodb_table.tasks-table.stream_arn
+#    TargetArn = aws_cloudwatch_log_group.pipe_log.arn
+#  }
 #
-#resource "awscc_pipes_pipe" "dynamodb_stream_pipe" {
-#  name     = "new-tasks-stream-2"
-#  source   = aws_dynamodb_table.tasks-table.stream_arn
-#  target   = aws_cloudwatch_log_group.pipe_log.arn
-#  role_arn = aws_iam_role.pipe_role.arn
-#  source_parameters = {
-#    dynamo_db_stream_parameters = {
-#      starting_position = "LATEST"
+#  template_body = jsonencode({
+#    "Parameters" : {
+#      "SourceArn" : {
+#        "Type" : "String",
+#      },
+#      "TargetArn" : {
+#        "Type" : "String",
+#      },
+#      "RoleArn" : {
+#        "Type" : "String"
+#      }
 #    },
-#    filter_criteria = {
-#      filters = [{ pattern : "{\"eventSourceARN\" : [{ \"prefix\":\"${aws_dynamodb_table.tasks-table.arn}/stream\"}]}" }]
+#    "Resources" : {
+#      "TasksPipe" : {
+#        "Type" : "AWS::Pipes::Pipe",
+#        "Properties" : {
+#          "Name" : "new-tasks-stream-3",
+#          "RoleArn" : { "Ref" : "RoleArn" }
+#          "Source" : { "Ref" : "SourceArn" },
+#          "SourceParameters" : {
+#            "FilterCriteria": {
+#              "Filters" : [{"Pattern" : "{\"eventSourceARN\" : [{ \"prefix\":\"${aws_dynamodb_table.tasks-table.arn}/stream\"}]}"}]
+#            },
+#            "DynamoDBStreamParameters" : {
+#              "StartingPosition" : "LATEST",
+#              "BatchSize" : 1
+#            }
+#          }
+#          "Target" : { "Ref" : "TargetArn" },
+#          "TargetParameters" : {
+#            "CloudWatchLogsParameters" : {
+#              "LogStreamName" : "tasks-created"
+#            },
+#            "InputTemplate" : "{\"source\": \"dynamodb.tasks\",\"eventName\": <$.eventName>,\"task\": {\"id\": <$.dynamodb.NewImage.PK.S>,\"state\": <$.dynamodb.NewImage.state.S> } }"
+#          }
+#        }
+#      }
 #    }
-#  }
-#  target_parameters = {
-#    input_template = "{\"source\": \"dynamodb.tasks\",\"eventName\": <$.eventName>,\"task\": {\"id\": <$.dynamodb.NewImage.PK.S>,\"state\": <$.dynamodb.NewImage.state.S> } }",
-#    cloudwatch_logs_parameters = {
-#      log_stream_name = "tasks-created"
-#    }
-#  }
+#  })
 #}
+
+
+resource "awscc_pipes_pipe" "dynamodb_stream_pipe" {
+  name     = "dynamodb-tasks-stream"
+  source   = aws_dynamodb_table.tasks-table.stream_arn
+  target   = aws_cloudwatch_log_group.pipe_log.arn
+  role_arn = aws_iam_role.pipe_role.arn
+  source_parameters = {
+    dynamo_db_stream_parameters = {
+      starting_position = "LATEST",
+      batch_size = 1
+    }
+  }
+  target_parameters = {
+    input_template = "{\"source\": \"dynamodb.tasks\",\"eventName\": <$.eventName>,\"task\": {\"id\": <$.dynamodb.NewImage.PK.S>,\"state\": <$.dynamodb.NewImage.state.S> } }",
+    cloudwatch_logs_parameters = {
+      log_stream_name = "tasks-created"
+    }
+  }
+}
 
 
