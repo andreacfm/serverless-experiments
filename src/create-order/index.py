@@ -10,10 +10,12 @@ PENDING = 'pending'
 
 def lambda_handler(event, context):
     order_id = str(uuid.uuid4())
+    reason = "Waiting for shipping"
     response = table.put_item(
         Item={
             'PK': order_id,
-            'state': PENDING
+            'state': PENDING,
+            'reason': reason
         }
     )
     print(response)
@@ -25,6 +27,6 @@ def lambda_handler(event, context):
         "body": json.dumps({
             "order_id ": order_id,
             "state": PENDING,
-            "reason": "Waiting for shipping confirmation"
+            "reason": reason
         })
     }

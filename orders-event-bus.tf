@@ -27,15 +27,15 @@ resource "aws_cloudwatch_event_rule" "create_orders_rule" {
   event_bus_name = aws_cloudwatch_event_bus.orders_bus.name
 
   event_pattern = jsonencode({
+    source = ["dynamodb.orders"]
     detail = {
-      source    = ["dynamodb.orders"],
       eventName = ["INSERT"]
     }
   })
 }
 
 resource "aws_iam_role" "carrier_api_destination_role" {
-  name = "EventBridgeApiDestinationRole"
+  name = "EventBridgeApiDestinationCarrierRole"
   assume_role_policy = jsonencode({
     "Version" = "2012-10-17"
     "Statement" = [
@@ -56,9 +56,7 @@ resource "aws_iam_role" "carrier_api_destination_role" {
         Action = [
           "events:InvokeApiDestination"
         ],
-        Resource = [
-          "${aws_cloudwatch_event_api_destination.carrier_api_destination.arn}:*"
-        ]
+        Resource = [aws_cloudwatch_event_api_destination.carrier_api_destination.arn]
       }
     })
   }
