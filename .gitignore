@@ -39,3 +39,4 @@ terraform.rc
 /.aws-sam-iacs
 /venv
 /.terraform.lock.hcl
+/.venv
