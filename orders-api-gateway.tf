@@ -1,15 +1,15 @@
 locals {
-  api_name = "orders-api"
+  orders_api_name = "orders-api"
 }
-resource "aws_api_gateway_rest_api" "orders-api" {
+resource "aws_api_gateway_rest_api" "orders_api" {
   body = jsonencode({
     openapi = "3.0.1"
     info = {
-      title   = local.api_name
+      title   = local.orders_api_name
       version = "1.0"
     }
     paths = {
-      "/" = {
+      "/orders" = {
         post = {
           x-amazon-apigateway-integration = {
             httpMethod           = "POST"
@@ -22,18 +22,18 @@ resource "aws_api_gateway_rest_api" "orders-api" {
     }
   })
 
-  name = local.api_name
+  name = local.orders_api_name
 
   endpoint_configuration {
     types = ["REGIONAL"]
   }
 }
 
-resource "aws_api_gateway_deployment" "deployment" {
-  rest_api_id = aws_api_gateway_rest_api.orders-api.id
+resource "aws_api_gateway_deployment" "orders_api_deployment" {
+  rest_api_id = aws_api_gateway_rest_api.orders_api.id
 
   triggers = {
-    redeployment = sha1(jsonencode(aws_api_gateway_rest_api.orders-api.body))
+    redeployment = sha1(jsonencode(aws_api_gateway_rest_api.orders_api.body))
   }
 
   lifecycle {
@@ -42,11 +42,11 @@ resource "aws_api_gateway_deployment" "deployment" {
 }
 
 resource "aws_api_gateway_stage" "stage" {
-  deployment_id = aws_api_gateway_deployment.deployment.id
-  rest_api_id   = aws_api_gateway_rest_api.orders-api.id
+  deployment_id = aws_api_gateway_deployment.orders_api_deployment.id
+  rest_api_id   = aws_api_gateway_rest_api.orders_api.id
   stage_name    = "prod"
 }
 
 output "orders_api_gateway_url" {
-  value = aws_api_gateway_deployment.deployment.invoke_url
+  value = aws_api_gateway_deployment.orders_api_deployment.invoke_url
 }
