@@ -9,7 +9,7 @@ resource "aws_api_gateway_rest_api" "third_parties_api" {
       version = "1.0"
     }
     paths = {
-      "/orders/{order_id}/action/confirm-shipment" = {
+      "/confirm-shipment" = {
         post = {
           x-amazon-apigateway-integration = {
             httpMethod           = "POST"

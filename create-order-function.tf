@@ -5,7 +5,7 @@ module "create-order-function" {
   source = "registry.terraform.io/terraform-aws-modules/lambda/aws"
 
   function_name = local.create_order
-  description   = "Create Task"
+  description   = "Create Order"
   handler       = "index.lambda_handler"
   runtime       = "python3.9"
   publish       = true

@@ -23,7 +23,7 @@ module "confirm-shipment-function" {
   policy_statements = {
     dynamodb = {
       effect    = "Allow",
-      actions   = ["dynamodb:PutItem"],
+      actions   = ["dynamodb:UpdateItem"],
       resources = [aws_dynamodb_table.orders-table.arn]
     }
   }

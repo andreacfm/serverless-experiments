@@ -17,10 +17,11 @@ table = dynamodb.Table(os.environ.get('DYNAMO_DB_TABLE_NAME'))
 SHIPPED = "shipped"
 
 
-@app.post("/orders/<order_id>/actions/confirm-shipment")
-def confirm_shipment(order_id):
+@app.post("/confirm-shipment")
+def confirm_shipment():
     today = datetime.now()
     iso_date = today.isoformat()
+    order_id = app.current_event.json_body.get("order_id")
     try:
         table.update_item(
             Key={'PK': order_id},
@@ -39,4 +40,5 @@ def confirm_shipment(order_id):
 
 
 def lambda_handler(event, context):
+    logger.info(event)
     return app.resolve(event, context)
