@@ -104,7 +104,7 @@ resource "aws_cloudformation_stack" "dynamodb_stream_pipe" {
               "Source" : "dynamodb.orders",
               "DetailType": "Event from dynamodb-orders-stream pipe"
             },
-            "InputTemplate" : "{\"eventName\": <$.eventName>,\"task\": {\"id\": <$.dynamodb.NewImage.PK.S>,\"state\": <$.dynamodb.NewImage.state.S> } }"
+            "InputTemplate" : "{\"eventName\": <$.eventName>,\"order\": {\"id\": <$.dynamodb.NewImage.PK.S>,\"state\": <$.dynamodb.NewImage.state.S> } }"
           }
         }
       }

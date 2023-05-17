@@ -16,7 +16,7 @@ resource "aws_cloudwatch_event_connection" "carrier_connection" {
 
 resource "aws_cloudwatch_event_api_destination" "carrier_api_destination" {
   name                             = "carrier-api-destination"
-  invocation_endpoint              = var.carrier_api_endpoint
+  invocation_endpoint              = "${module.carrier-mock-function.lambda_function_url}/orders"
   http_method                      = "POST"
   invocation_rate_limit_per_second = 20
   connection_arn                   = aws_cloudwatch_event_connection.carrier_connection.arn
@@ -67,4 +67,11 @@ resource "aws_cloudwatch_event_target" "example" {
   rule           = aws_cloudwatch_event_rule.create_orders_rule.name
   arn            = aws_cloudwatch_event_api_destination.carrier_api_destination.arn
   role_arn       = aws_iam_role.carrier_api_destination_role.arn
+  input_transformer {
+    input_template = "{\"order_id\" : \"<order_id>\", \"state\" : \"<state>\"}"
+    input_paths = {
+      order_id = "$.detail.order.id"
+      state = "$.detail.order.state"
+    }
+  }
 }
