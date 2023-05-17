@@ -9,7 +9,7 @@ module "confirm-shipment-function" {
   handler       = "index.lambda_handler"
   runtime       = "python3.9"
   publish       = true
-  layers = ["arn:aws:lambda:us-east-1:017000801446:layer:AWSLambdaPowertoolsPythonV2:32"]
+  layers = ["arn:aws:lambda:${var.region}:017000801446:layer:AWSLambdaPowertoolsPythonV2:32"]
 
   source_path = "./src/${local.confirm_shipment}"
 

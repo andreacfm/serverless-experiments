@@ -112,23 +112,4 @@ resource "aws_cloudformation_stack" "dynamodb_stream_pipe" {
   })
 }
 
-#resource "aws_pipes_pipe" "dynamodb_stream_pipe" {
-#  name     = "dynamodb-orders-stream"
-#  source   = aws_dynamodb_table.orders-table.stream_arn
-#  target   = aws_cloudwatch_event_bus.orders_bus.arn
-#  role_arn = aws_iam_role.orders_pipe_role.arn
-#  source_parameters {
-#    dynamo_db_stream_parameters = {
-#      starting_position = "LATEST",
-#      batch_size        = 1
-#    }
-#  }
-#  target_parameters {
-#    input_template = "{\"source\": \"dynamodb.orders\",\"eventName\": <$.eventName>,\"task\": {\"id\": <$.dynamodb.NewImage.PK.S>,\"state\": <$.dynamodb.NewImage.state.S> } }"
-#    event_bridge_event_bus_parameters {
-#      source = "dynamodb.orders"
-#    }
-#  }
-#}
-
 

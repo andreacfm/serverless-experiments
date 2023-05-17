@@ -11,7 +11,7 @@ module "carrier-mock-function" {
   publish                    = true
   source_path                = "./src/${local.carrier_mock}"
   create_lambda_function_url = true
-  layers = ["arn:aws:lambda:us-east-1:017000801446:layer:AWSLambdaPowertoolsPythonV2:32"]
+  layers = ["arn:aws:lambda:${var.region}:017000801446:layer:AWSLambdaPowertoolsPythonV2:32"]
 
   environment_variables = {
     "THIRD_PARTIES_API_BASE_URL" = "${aws_api_gateway_deployment.third_parties_api_deployment.invoke_url}${aws_api_gateway_stage.third_parties_api_stage.stage_name}"
