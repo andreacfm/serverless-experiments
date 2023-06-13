@@ -1,24 +1,24 @@
 locals {
-  carrier_mock = "carrier-mock"
+  carrier_api = "carrier-api"
 }
 module "carrier-mock-function" {
   source = "registry.terraform.io/terraform-aws-modules/lambda/aws"
 
-  function_name              = local.carrier_mock
+  function_name              = local.carrier_api
   description                = "Carrier Mock"
   handler                    = "index.lambda_handler"
   runtime                    = "python3.9"
   publish                    = true
-  source_path                = "./src/${local.carrier_mock}"
+  source_path                = "./src/${local.carrier_api}"
   create_lambda_function_url = true
   layers = ["arn:aws:lambda:${var.region}:017000801446:layer:AWSLambdaPowertoolsPythonV2:32"]
 
   environment_variables = {
-    "THIRD_PARTIES_API_BASE_URL" = "${aws_api_gateway_deployment.third_parties_api_deployment.invoke_url}${aws_api_gateway_stage.third_parties_api_stage.stage_name}"
+    "INTEGRATION_API_BASE_URL" = "${aws_api_gateway_deployment.integration_api_deployment.invoke_url}${aws_api_gateway_stage.integration_api_stage.stage_name}"
   }
 
   tags = {
-    Name = local.carrier_mock
+    Name = local.carrier_api
   }
 }
 

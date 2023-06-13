@@ -31,7 +31,7 @@ module "confirm-shipment-function" {
   allowed_triggers = {
     APIGatewayProdPost = {
       service    = "apigateway"
-      source_arn = "arn:aws:execute-api:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.third_parties_api.id}/${aws_api_gateway_stage.third_parties_api_stage.stage_name}/POST/*"
+      source_arn = "arn:aws:execute-api:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.integration_api.id}/${aws_api_gateway_stage.integration_api_stage.stage_name}/POST/*"
     }
   }
 
