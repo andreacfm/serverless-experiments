@@ -23,7 +23,7 @@ resource "aws_cloudwatch_event_api_destination" "carrier_api_destination" {
 }
 
 resource "aws_cloudwatch_event_rule" "create_orders_rule" {
-  name           = "orders-created"
+  name           = "order-created"
   event_bus_name = aws_cloudwatch_event_bus.orders_bus.name
 
   event_pattern = jsonencode({
@@ -62,7 +62,7 @@ resource "aws_iam_role" "carrier_api_destination_role" {
   }
 }
 
-resource "aws_cloudwatch_event_target" "example" {
+resource "aws_cloudwatch_event_target" "carrie_api_destination" {
   event_bus_name = aws_cloudwatch_event_bus.orders_bus.name
   rule           = aws_cloudwatch_event_rule.create_orders_rule.name
   arn            = aws_cloudwatch_event_api_destination.carrier_api_destination.arn
@@ -72,6 +72,30 @@ resource "aws_cloudwatch_event_target" "example" {
     input_paths = {
       order_id = "$.detail.order.id"
       state = "$.detail.order.state"
+    }
+  }
+}
+
+resource "aws_cloudwatch_event_rule" "order_shipped_rule" {
+  name           = "order-shipped"
+  event_bus_name = aws_cloudwatch_event_bus.orders_bus.name
+
+  event_pattern = jsonencode({
+    source = ["carrier"]
+    "detail-type" = ["carrier.order_shipped"]
+  })
+}
+
+
+resource "aws_cloudwatch_event_target" "confirm_shipment_function" {
+  event_bus_name = aws_cloudwatch_event_bus.orders_bus.name
+  rule           = aws_cloudwatch_event_rule.order_shipped_rule.name
+  arn            = module.confirm-shipment-function.lambda_function_arn
+  input_transformer {
+    input_template = "{\"order_id\" : \"<order_id>\", \"shipped_at\" : \"<shipped_at>\"}"
+    input_paths = {
+      order_id = "$.detail.order_id"
+      shipped_at = "$.detail.shipped_at"
     }
   }
 }

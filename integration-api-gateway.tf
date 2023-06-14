@@ -11,11 +11,33 @@ resource "aws_api_gateway_rest_api" "integration_api" {
     paths = {
       "/confirm-shipment" = {
         post = {
-          x-amazon-apigateway-integration = {
-            httpMethod           = "POST"
-            payloadFormatVersion = "1.0"
-            type                 = "aws_proxy"
-            uri                  = module.confirm-shipment-function.lambda_function_qualified_invoke_arn
+          "x-amazon-apigateway-integration" = {
+            httpMethod  = "POST"
+            type        = "aws"
+            uri         = "arn:aws:apigateway:${data.aws_region.current.name}:events:action/PutEvents"
+            credentials = "arn:aws:iam::306779470681:role/ToBeDeleted",
+            "responses" = {
+              "default" = {
+                "statusCode" = "200"
+              }
+            },
+            "requestParameters" : {
+              "integration.request.header.X-Amz-Target" : "'AWSEvents.PutEvents'",
+              "integration.request.header.Content-Type" : "'application/x-amz-json-1.1'"
+            },
+            "requestTemplates" = {
+              "application/json" = <<EOF
+{
+  "Entries":[{
+    "Source":"carrier",
+    "Detail":"{\"shipped_at\": $util.escapeJavaScript($input.json('$.shipped_at')),\"order_id\": $util.escapeJavaScript($input.json('$.order_id'))}",
+    "DetailType": "carrier.order_shipped",
+    "EventBusName": "orders"
+  }]
+}
+EOF
+            },
+            "passthroughBehavior" : "when_no_templates"
           }
         }
       }

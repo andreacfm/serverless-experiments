@@ -5,6 +5,7 @@ import uuid
 
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(os.environ.get('DYNAMO_DB_TABLE_NAME'))
+
 PENDING = 'pending'
 
 

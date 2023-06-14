@@ -102,7 +102,7 @@ resource "aws_cloudformation_stack" "dynamodb_stream_pipe" {
           "TargetParameters" : {
             "EventBridgeEventBusParameters" : {
               "Source" : "dynamodb.orders",
-              "DetailType": "Event from dynamodb-orders-stream pipe"
+              "DetailType": "dynamodb-orders-stream"
             },
             "InputTemplate" : "{\"eventName\": <$.eventName>,\"order\": {\"id\": <$.dynamodb.NewImage.PK.S>,\"state\": <$.dynamodb.NewImage.state.S> } }"
           }
