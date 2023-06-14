@@ -18,6 +18,16 @@ resource "aws_api_gateway_rest_api" "orders_api" {
             uri                  = module.create-order-function.lambda_function_qualified_invoke_arn
           }
         }
+      },
+      "/order" = {
+        get = {
+          x-amazon-apigateway-integration = {
+            httpMethod           = "GET"
+            payloadFormatVersion = "1.0"
+            type                 = "aws_proxy"
+            uri                  = module.create-order-function.lambda_function_qualified_invoke_arn
+          }
+        }
       }
     }
   })

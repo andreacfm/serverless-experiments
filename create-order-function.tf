@@ -9,6 +9,7 @@ module "create-order-function" {
   handler       = "index.lambda_handler"
   runtime       = "python3.9"
   publish       = true
+  layers = ["arn:aws:lambda:${var.region}:017000801446:layer:AWSLambdaPowertoolsPythonV2:32"]
 
   source_path = "./src/${local.create_order}"
 
@@ -28,7 +29,11 @@ module "create-order-function" {
   allowed_triggers = {
     APIGatewayProdPost = {
       service    = "apigateway"
-      source_arn = "arn:aws:execute-api:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.orders_api.id}/prod/POST/orders"
+      source_arn = "arn:aws:execute-api:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.orders_api.id}/prod/POST/*"
+    }
+    APIGatewayProdGet = {
+      service    = "apigateway"
+      source_arn = "arn:aws:execute-api:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.orders_api.id}/prod/GET/*"
     }
   }
 

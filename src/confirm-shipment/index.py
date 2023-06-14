@@ -15,8 +15,6 @@ SHIPPED = "shipped"
 
 
 def lambda_handler(event, context):
-    today = datetime.now()
-    iso_date = today.isoformat()
     order_id = event["order_id"]
     shipped_at = event["shipped_at"]
     try:
