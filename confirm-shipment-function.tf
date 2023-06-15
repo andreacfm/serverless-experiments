@@ -36,6 +36,6 @@ module "confirm-shipment-function" {
   }
 
   tags = {
-    Name = local.create_order
+    Name = local.confirm_shipment
   }
 }

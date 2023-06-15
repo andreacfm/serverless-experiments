@@ -15,7 +15,7 @@ PENDING = 'pending'
 
 
 @app.post("/orders")
-def create_order(event, context):
+def create_order():
     order_id = str(uuid.uuid4())
     reason = "Waiting for shipping"
     response = table.put_item(
@@ -39,11 +39,11 @@ def create_order(event, context):
     }
 
 
-@app.get("/order")
-def get_order(order_id):
+@app.get("/order/<id>")
+def get_order(id):
     response = table.get_item(
-        Item={
-            'PK': order_id
+        Key={
+            'PK': id
         }
     )
     return {
