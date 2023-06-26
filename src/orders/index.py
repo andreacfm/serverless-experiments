@@ -25,7 +25,6 @@ def create_order():
             'reason': reason
         }
     )
-    print(response)
     return {
         "statusCode": 200,
         "headers": {
