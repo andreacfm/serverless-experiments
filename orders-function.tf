@@ -10,6 +10,7 @@ module "create-order-function" {
   runtime       = "python3.9"
   publish       = true
   layers = ["arn:aws:lambda:${var.region}:017000801446:layer:AWSLambdaPowertoolsPythonV2:32"]
+  cloudwatch_logs_retention_in_days = 1
 
   source_path = "./src/${local.orders}"
 

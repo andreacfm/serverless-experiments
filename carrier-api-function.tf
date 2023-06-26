@@ -11,6 +11,7 @@ module "carrier-mock-function" {
   publish                    = true
   source_path                = "./src/${local.carrier_api}"
   create_lambda_function_url = true
+  cloudwatch_logs_retention_in_days = 1
   layers = ["arn:aws:lambda:${var.region}:017000801446:layer:AWSLambdaPowertoolsPythonV2:32"]
 
   environment_variables = {

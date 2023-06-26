@@ -31,7 +31,7 @@ def create_order():
             "Content-Type": "application/json"
         },
         "body": json.dumps({
-            "order_id ": order_id,
+            "order_id": order_id,
             "state": PENDING,
             "reason": reason
         })

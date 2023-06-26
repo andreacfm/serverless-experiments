@@ -1,6 +1,35 @@
 locals {
   integration_api_name = "third-parties-api"
 }
+
+resource "aws_iam_role" "integration_api" {
+  name = "IntegrationApiGatewayRole"
+  assume_role_policy = jsonencode({
+    "Version" = "2012-10-17"
+    "Statement" = [
+      {
+        "Effect" = "Allow"
+        "Principal" = {
+          "Service" = "apigateway.amazonaws.com"
+        },
+        "Action" = "sts:AssumeRole"
+      }
+    ]
+  })
+  inline_policy {
+    name = "AllowEventBridgePutEvents"
+    policy = jsonencode({
+      Statement = {
+        Effect = "Allow",
+        Action = [
+          "events:PutEvents"
+        ],
+        Resource = [aws_cloudwatch_event_bus.orders_bus.arn]
+      }
+    })
+  }
+}
+
 resource "aws_api_gateway_rest_api" "integration_api" {
   body = jsonencode({
     openapi = "3.0.1"
@@ -15,7 +44,7 @@ resource "aws_api_gateway_rest_api" "integration_api" {
             httpMethod  = "POST"
             type        = "aws"
             uri         = "arn:aws:apigateway:${data.aws_region.current.name}:events:action/PutEvents"
-            credentials = "arn:aws:iam::306779470681:role/ToBeDeleted",
+            credentials = aws_iam_role.integration_api.arn,
             "responses" = {
               "default" = {
                 "statusCode" = "200"
