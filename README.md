@@ -2,6 +2,7 @@
 
 ### Architecture
 
+![Architecture](./img/archi.png)
 
 ### Deploy the solution
 
