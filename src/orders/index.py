@@ -45,12 +45,13 @@ def get_order(id):
             'PK': id
         }
     )
+    print(response)
     return {
         "statusCode": 200,
         "headers": {
             "Content-Type": "application/json"
         },
-        "body": json.dumps(response)
+        "body": json.dumps({"id": response["Item"]["PK"], "state": response["Item"]["state"], "reason": response["Item"]["reason"]})
     }
 
 
