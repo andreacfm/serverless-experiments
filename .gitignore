@@ -35,8 +35,7 @@ override.tf.json
 terraform.rc
 
 .envrc
-/builds/
-/.aws-sam-iacs
-/venv
-/.terraform.lock.hcl
-/.venv
+/**/builds/**
+*/.aws-sam-iacs
+.terraform.lock.hcl
+.venv
